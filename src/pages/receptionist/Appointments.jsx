@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Plus, Pencil } from 'lucide-react'
+import { Search, Plus, Pencil } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import ReceptionistLayout from '../../layouts/ReceptionistLayout'
 import { ModalShell, ModalActions } from '../../components/shared/Modal'
@@ -33,6 +33,7 @@ export default function ReceptionistAppointments() {
   const [depts,    setDepts]    = useState([])
   const [loading,  setLoading]  = useState(true)
   const [page,     setPage]     = useState(1)
+  const [search,   setSearch]   = useState('')
   const [statusF,  setStatusF]  = useState('')
   const [dateF,    setDateF]    = useState('')
 
@@ -63,18 +64,25 @@ export default function ReceptionistAppointments() {
 
     if (statusF) q = q.eq('status', statusF)
     if (dateF)   q = q.eq('date', dateF)
+    if (search) {
+      const { data: pts } = await supabase.from('patients')
+        .select('patient_id').ilike('name', `%${search}%`)
+      const ids = (pts ?? []).map(p => p.patient_id)
+      if (ids.length === 0) { setRows([]); setTotal(0); setLoading(false); return }
+      q = q.in('patient_id', ids)
+    }
 
     const { data, count, error } = await q
     if (error) toast.error(error.message)
     else { setRows(data ?? []); setTotal(count ?? 0) }
     setLoading(false)
-  }, [page, statusF, dateF])
+  }, [page, search, statusF, dateF])
 
   useEffect(() => { fetch(page) }, [page])
   useEffect(() => {
     const t = setTimeout(() => { setPage(1); fetch(1) }, 300)
     return () => clearTimeout(t)
-  }, [statusF, dateF])
+  }, [search, statusF, dateF])
 
   function pickDoctor(id) {
     const doc = doctors.find(d => d.doctor_id === id)
@@ -121,6 +129,11 @@ export default function ReceptionistAppointments() {
       </div>
 
       <div className="flex flex-wrap gap-3 mb-4">
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input className="input pl-9" placeholder="Search patient name…"
+            value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
         <input className="input w-40" type="date" value={dateF}
           onChange={e => setDateF(e.target.value)} />
         <select className="input w-36" value={statusF} onChange={e => setStatusF(e.target.value)}>

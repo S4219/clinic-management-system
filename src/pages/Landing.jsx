@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import {
   Heart, Shield, Clock, Users, Calendar, FileText, FlaskConical,
-  CreditCard, Star, Phone, Mail, MapPin, ChevronRight, Menu, X,
+  CreditCard, ChevronRight, Menu, X,
   Activity, Stethoscope, Pill, CheckCircle
 } from 'lucide-react'
 import { useState } from 'react'
 
-const NAV_LINKS = ['Services', 'Features', 'About', 'Contact']
+const NAV_LINKS = ['Services', 'Features', 'About']
 
 const SERVICES = [
   {
@@ -56,19 +56,6 @@ const FEATURES = [
   { icon: <Shield className="w-5 h-5" />, title: 'Role-Based Access', desc: 'Separate dashboards for Admin, Doctors, and Receptionists.' },
 ]
 
-const STATS = [
-  { value: '5,000+', label: 'Patients Served' },
-  { value: '50+', label: 'Specialist Doctors' },
-  { value: '15+', label: 'Departments' },
-  { value: '99%', label: 'Patient Satisfaction' },
-]
-
-const TESTIMONIALS = [
-  { name: 'Priya Sharma', role: 'Patient', text: 'The online appointment system is incredibly convenient. I got my reports in minutes!', rating: 5 },
-  { name: 'Dr. Arjun Mehta', role: 'Cardiologist', text: 'The doctor dashboard makes managing patient records effortless and efficient.', rating: 5 },
-  { name: 'Rahul Verma', role: 'Patient', text: 'Professional staff, clean facilities, and transparent billing. Highly recommended.', rating: 5 },
-]
-
 export default function Landing() {
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -79,7 +66,6 @@ export default function Landing() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
                 <Heart className="w-5 h-5 text-white" />
@@ -87,7 +73,6 @@ export default function Landing() {
               <span className="text-lg font-bold text-gray-900">ClinicMS</span>
             </div>
 
-            {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-8">
               {NAV_LINKS.map(link => (
                 <a
@@ -101,28 +86,20 @@ export default function Landing() {
             </nav>
 
             <div className="hidden md:flex items-center gap-3">
-              <Link
-                to="/login"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-              >
+              <Link to="/login" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
                 Sign In
               </Link>
-              <Link
-                to="/login"
-                className="btn-primary text-sm"
-              >
+              <Link to="/login" className="btn-primary text-sm">
                 Get Started
               </Link>
             </div>
 
-            {/* Mobile hamburger */}
             <button className="md:hidden p-2 text-gray-500" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-2">
             {NAV_LINKS.map(link => (
@@ -145,15 +122,10 @@ export default function Landing() {
 
       {/* ── Hero ── */}
       <section className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-teal-500 overflow-hidden">
-        {/* Decorative circles */}
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5" />
         <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-white/5" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center">
-          <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
-            <CheckCircle className="w-3.5 h-3.5" />
-            Trusted by 5,000+ patients
-          </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
             Modern Healthcare,<br />
             <span className="text-blue-200">Simplified Management</span>
@@ -175,18 +147,6 @@ export default function Landing() {
             >
               Explore Services
             </a>
-          </div>
-        </div>
-
-        {/* Stats bar */}
-        <div className="relative bg-white/10 border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-white">
-            {STATS.map(s => (
-              <div key={s.label}>
-                <div className="text-2xl md:text-3xl font-bold">{s.value}</div>
-                <div className="text-xs text-blue-200 mt-1 font-medium">{s.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -219,7 +179,6 @@ export default function Landing() {
       <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-14 items-center">
-            {/* Left — text */}
             <div>
               <span className="text-xs font-semibold text-teal-600 uppercase tracking-widest">Platform Features</span>
               <h2 className="mt-2 text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
@@ -246,7 +205,6 @@ export default function Landing() {
               </Link>
             </div>
 
-            {/* Right — visual card mock */}
             <div className="relative">
               <div className="bg-gradient-to-br from-blue-600 to-teal-500 rounded-3xl p-0.5 shadow-2xl shadow-blue-200">
                 <div className="bg-white rounded-3xl p-6 space-y-4">
@@ -291,16 +249,6 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
-              {/* Floating badge */}
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg px-4 py-3 border border-gray-100 flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-900">Fully HIPAA Ready</p>
-                  <p className="text-xs text-gray-400">Secure & Compliant</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -316,7 +264,7 @@ export default function Landing() {
           </p>
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
             {[
-              { icon: <Clock className="w-6 h-6" />, title: 'Save Time', desc: 'Reduce appointment scheduling time by 70% with our smart booking system.' },
+              { icon: <Clock className="w-6 h-6" />, title: 'Save Time', desc: 'Reduce appointment scheduling time with our smart booking system.' },
               { icon: <Shield className="w-6 h-6" />, title: 'Data Security', desc: 'Patient records protected with enterprise-grade security and role-based access.' },
               { icon: <Users className="w-6 h-6" />, title: 'Team Collaboration', desc: 'Doctors, receptionists and admins work seamlessly on a single platform.' },
             ].map(item => (
@@ -328,93 +276,6 @@ export default function Landing() {
                 <p className="text-sm text-blue-100 leading-relaxed">{item.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Testimonials ── */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-xs font-semibold text-blue-600 uppercase tracking-widest">Testimonials</span>
-            <h2 className="mt-2 text-3xl font-bold text-gray-900">What People Say</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map(t => (
-              <div key={t.name} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed italic">"{t.text}"</p>
-                <div className="mt-5 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-white text-sm font-bold">
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
-                    <p className="text-xs text-gray-400">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Contact ── */}
-      <section id="contact" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            <div>
-              <span className="text-xs font-semibold text-blue-600 uppercase tracking-widest">Get In Touch</span>
-              <h2 className="mt-2 text-3xl font-bold text-gray-900">We're Here to Help</h2>
-              <p className="mt-3 text-gray-500 text-sm leading-relaxed max-w-md">
-                Have questions about ClinicMS? Reach out to our support team and we'll get back to you within 24 hours.
-              </p>
-              <div className="mt-8 space-y-4">
-                {[
-                  { icon: <Phone className="w-5 h-5 text-blue-600" />, label: 'Phone', value: '+91 98765 43210' },
-                  { icon: <Mail className="w-5 h-5 text-blue-600" />, label: 'Email', value: 'support@clinicms.com' },
-                  { icon: <MapPin className="w-5 h-5 text-blue-600" />, label: 'Address', value: '123 Health Street, Mumbai, MH 400001' },
-                ].map(item => (
-                  <div key={item.label} className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400 font-medium">{item.label}</p>
-                      <p className="text-sm font-medium text-gray-800 mt-0.5">{item.value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-              <h3 className="text-base font-semibold text-gray-900 mb-5">Send a Message</h3>
-              <form className="space-y-4" onSubmit={e => e.preventDefault()}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="label">First Name</label>
-                    <input className="input" placeholder="John" />
-                  </div>
-                  <div>
-                    <label className="label">Last Name</label>
-                    <input className="input" placeholder="Doe" />
-                  </div>
-                </div>
-                <div>
-                  <label className="label">Email</label>
-                  <input className="input" type="email" placeholder="john@example.com" />
-                </div>
-                <div>
-                  <label className="label">Message</label>
-                  <textarea className="input resize-none" rows={4} placeholder="How can we help you?" />
-                </div>
-                <button type="submit" className="btn-primary w-full justify-center">Send Message</button>
-              </form>
-            </div>
           </div>
         </div>
       </section>
@@ -453,14 +314,6 @@ export default function Landing() {
                   </li>
                 ))}
               </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-2">
-            <p className="text-xs">© {new Date().getFullYear()} ClinicMS. All rights reserved.</p>
-            <div className="flex gap-6">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map(item => (
-                <a key={item} href="#" className="text-xs hover:text-white transition-colors">{item}</a>
-              ))}
             </div>
           </div>
         </div>

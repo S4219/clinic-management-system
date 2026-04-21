@@ -399,7 +399,7 @@ export default function ReceptionistDashboard() {
     ] = await Promise.all([
       supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('date', today),
       supabase.from('appointments').select('*', { count: 'exact', head: true }),
-      supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('status', 'scheduled'),
+      supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('date', today).eq('status', 'scheduled'),
       supabase.from('bills').select('*', { count: 'exact', head: true }).eq('payment_status', 'pending'),
     ])
     setStats({ today: todayCount, total: totalCount, pending: scheduledCount, pendingBills })

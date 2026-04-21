@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Search, ChevronDown, ChevronRight } from 'lucide-react'
+import { Search, ChevronDown, ChevronRight, Trash2 } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import AdminLayout from '../../layouts/AdminLayout'
 import Pagination from '../../components/shared/Pagination'
 import { ModalShell } from '../../components/shared/Modal'
+import ConfirmModal from '../../components/shared/ConfirmModal'
 import toast from 'react-hot-toast'
 
 const PAGE_SIZE = 10
@@ -14,8 +15,10 @@ export default function AdminPrescriptions() {
   const [loading,  setLoading]  = useState(true)
   const [page,     setPage]     = useState(1)
   const [search,   setSearch]   = useState('')
-  const [expanded, setExpanded] = useState(null)
-  const [viewRx,   setViewRx]   = useState(null)
+  const [expanded,   setExpanded]   = useState(null)
+  const [viewRx,     setViewRx]     = useState(null)
+  const [delTarget,  setDelTarget]  = useState(null)
+  const [deleting,   setDeleting]   = useState(false)
 
   const fetch = useCallback(async (p = page) => {
     setLoading(true)
@@ -48,6 +51,16 @@ export default function AdminPrescriptions() {
 
   function toggleExpand(id) {
     setExpanded(prev => prev === id ? null : id)
+  }
+
+  async function confirmDelete() {
+    setDeleting(true)
+    await supabase.from('prescription_medicines').delete().eq('prescription_id', delTarget.prescription_id)
+    const { error } = await supabase.from('prescriptions').delete().eq('prescription_id', delTarget.prescription_id)
+    setDeleting(false)
+    if (error) { toast.error(error.message); return }
+    toast.success('Prescription deleted')
+    setDelTarget(null); fetch(page)
   }
 
   return (
@@ -108,7 +121,10 @@ export default function AdminPrescriptions() {
                               <span className="badge-purple">{r.prescription_medicines?.length??0} medicine{r.prescription_medicines?.length!==1?'s':''}</span>
                             </td>
                             <td className="td">
-                              <button onClick={() => setViewRx(r)} className="btn-ghost text-xs py-1 px-2">View Details</button>
+                              <div className="flex gap-1">
+                                <button onClick={() => setViewRx(r)} className="btn-ghost text-xs py-1 px-2">View</button>
+                                <button onClick={() => setDelTarget(r)} className="btn-ghost p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50"><Trash2 className="w-4 h-4"/></button>
+                              </div>
                             </td>
                           </tr>
 
@@ -206,6 +222,16 @@ export default function AdminPrescriptions() {
             <button className="btn-secondary" onClick={() => setViewRx(null)}>Close</button>
           </div>
         </ModalShell>
+      )}
+
+      {delTarget && (
+        <ConfirmModal
+          title="Delete Prescription"
+          message={`Delete prescription for "${delTarget.patients?.name}"? This will also remove all associated medicines and cannot be undone.`}
+          onConfirm={confirmDelete}
+          onCancel={() => setDelTarget(null)}
+          loading={deleting}
+        />
       )}
     </AdminLayout>
   )

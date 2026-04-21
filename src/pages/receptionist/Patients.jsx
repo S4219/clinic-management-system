@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Search, Plus, Eye } from 'lucide-react'
+import { Search, Plus, Eye, Pencil, Trash2 } from 'lucide-react'
 import { supabase } from '../../supabaseClient'
 import ReceptionistLayout from '../../layouts/ReceptionistLayout'
 import { ModalShell, ModalActions } from '../../components/shared/Modal'
+import ConfirmModal from '../../components/shared/ConfirmModal'
 import Pagination from '../../components/shared/Pagination'
 import toast from 'react-hot-toast'
 
@@ -24,9 +25,11 @@ export default function ReceptionistPatients() {
   const [search,  setSearch]  = useState('')
   const [statusF, setStatusF] = useState('')
 
-  const [modal,    setModal]    = useState(null)   // 'add' | 'view'
-  const [selected, setSelected] = useState(EMPTY)
-  const [saving,   setSaving]   = useState(false)
+  const [modal,     setModal]     = useState(null)   // 'add' | 'edit' | 'view'
+  const [selected,  setSelected]  = useState(EMPTY)
+  const [saving,    setSaving]    = useState(false)
+  const [delTarget, setDelTarget] = useState(null)
+  const [deleting,  setDeleting]  = useState(false)
 
   const fetch = useCallback(async (p = page) => {
     setLoading(true)
@@ -71,6 +74,33 @@ export default function ReceptionistPatients() {
     toast.success('Patient added')
     setModal(null)
     setSelected(EMPTY)
+    fetch(page)
+  }
+
+  async function handleEdit(e) {
+    e.preventDefault()
+    if (!selected.name || !selected.age || !selected.gender || !selected.contact) {
+      toast.error('Name, age, gender and contact are required'); return
+    }
+    setSaving(true)
+    const { patient_id, ...rest } = selected
+    const { error } = await supabase.from('patients')
+      .update({ ...rest, age: Number(selected.age) })
+      .eq('patient_id', patient_id)
+    setSaving(false)
+    if (error) { toast.error(error.message); return }
+    toast.success('Patient updated')
+    setModal(null)
+    fetch(page)
+  }
+
+  async function confirmDelete() {
+    setDeleting(true)
+    const { error } = await supabase.from('patients').delete().eq('patient_id', delTarget.patient_id)
+    setDeleting(false)
+    if (error) { toast.error(error.message); return }
+    toast.success('Patient deleted')
+    setDelTarget(null)
     fetch(page)
   }
 
@@ -143,13 +173,11 @@ export default function ReceptionistPatients() {
                           <span className={STATUS_BADGE[r.status] ?? 'badge-gray'}>{r.status}</span>
                         </td>
                         <td className="td">
-                          <button
-                            onClick={() => { setSelected(r); setModal('view') }}
-                            className="btn-ghost p-1.5"
-                            title="View details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
+                          <div className="flex gap-1">
+                            <button onClick={() => { setSelected(r); setModal('view') }} className="btn-ghost p-1.5" title="View"><Eye className="w-4 h-4" /></button>
+                            <button onClick={() => { setSelected(r); setModal('edit') }} className="btn-ghost p-1.5" title="Edit"><Pencil className="w-4 h-4" /></button>
+                            <button onClick={() => setDelTarget(r)} className="btn-ghost p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -229,6 +257,66 @@ export default function ReceptionistPatients() {
         </ModalShell>
       )}
 
+      {/* Edit Patient modal */}
+      {modal === 'edit' && (
+        <ModalShell title="Edit Patient" subtitle={selected.name} onClose={() => setModal(null)} size="lg">
+          <form onSubmit={handleEdit}>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className="label">Full Name *</label>
+                <input className="input" value={selected.name} onChange={e => set('name', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Age *</label>
+                <input className="input" type="number" min="0" max="150" value={selected.age} onChange={e => set('age', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Gender *</label>
+                <select className="input" value={selected.gender} onChange={e => set('gender', e.target.value)}>
+                  <option value="">Select…</option>
+                  <option>Male</option><option>Female</option><option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="label">Contact *</label>
+                <input className="input" value={selected.contact} onChange={e => set('contact', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Blood Group</label>
+                <select className="input" value={selected.blood_group} onChange={e => set('blood_group', e.target.value)}>
+                  <option value="">Select…</option>
+                  {BLOOD_GROUPS.map(g => <option key={g}>{g}</option>)}
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="label">Email</label>
+                <input className="input" type="email" value={selected.email} onChange={e => set('email', e.target.value)} />
+              </div>
+              <div className="col-span-2">
+                <label className="label">Emergency Contact</label>
+                <input className="input" value={selected.emergency_contact} onChange={e => set('emergency_contact', e.target.value)} placeholder="Name — Phone" />
+              </div>
+              <div>
+                <label className="label">Status</label>
+                <select className="input" value={selected.status} onChange={e => set('status', e.target.value)}>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="label">Address</label>
+                <textarea className="input resize-none" rows={2} value={selected.address} onChange={e => set('address', e.target.value)} />
+              </div>
+              <div className="col-span-2">
+                <label className="label">Medical History</label>
+                <textarea className="input resize-none" rows={2} value={selected.medical_history} onChange={e => set('medical_history', e.target.value)} placeholder="Known conditions, allergies…" />
+              </div>
+            </div>
+            <ModalActions onClose={() => setModal(null)} loading={saving} submitLabel="Save Changes" />
+          </form>
+        </ModalShell>
+      )}
+
       {/* View Patient modal */}
       {modal === 'view' && selected && (
         <ModalShell title="Patient Details" subtitle={selected.name} onClose={() => setModal(null)}>
@@ -279,6 +367,15 @@ export default function ReceptionistPatients() {
             <button className="btn-secondary" onClick={() => setModal(null)}>Close</button>
           </div>
         </ModalShell>
+      )}
+      {delTarget && (
+        <ConfirmModal
+          title="Delete Patient"
+          message={`Delete patient "${delTarget.name}"? This action cannot be undone.`}
+          onConfirm={confirmDelete}
+          onCancel={() => setDelTarget(null)}
+          loading={deleting}
+        />
       )}
     </ReceptionistLayout>
   )
